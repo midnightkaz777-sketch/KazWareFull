@@ -1,0 +1,501 @@
+--========================================================--
+--                    KAZWARE AVATAR CHANGER              --
+--========================================================--
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+--========================================================--
+-- AVATAR FUNCTIONS
+--========================================================--
+
+local function clearVisuals(Character)
+
+    for _, Object in ipairs(Character:GetChildren()) do
+        if Object:IsA("Accessory")
+            or Object:IsA("Hat")
+            or Object:IsA("Shirt")
+            or Object:IsA("Pants")
+            or Object:IsA("ShirtGraphic")
+            or Object:IsA("CharacterMesh") then
+
+            Object:Destroy()
+        end
+    end
+
+    local Head = Character:FindFirstChild("Head")
+
+    if Head then
+        for _, Object in ipairs(Head:GetChildren()) do
+            if Object:IsA("Decal")
+                and Object.Name:lower() == "face" then
+
+                Object:Destroy()
+            end
+        end
+    end
+
+    local BodyColors =
+        Character:FindFirstChildOfClass("BodyColors")
+
+    if BodyColors then
+        BodyColors:Destroy()
+    end
+end
+
+local function attachAccessory(Character, Accessory)
+
+    local Handle = Accessory:FindFirstChild("Handle")
+
+    if not Handle then
+        return
+    end
+
+    local TargetAttachment
+    local AccessoryAttachment
+
+    for _, Part in ipairs(Character:GetChildren()) do
+
+        if Part:IsA("BasePart") then
+
+            for _, Attachment in ipairs(Part:GetChildren()) do
+
+                if Attachment:IsA("Attachment") then
+
+                    local Matching =
+                        Handle:FindFirstChild(Attachment.Name)
+
+                    if Matching and Matching:IsA("Attachment") then
+                        TargetAttachment = Attachment
+                        AccessoryAttachment = Matching
+                        break
+                    end
+                end
+            end
+        end
+
+        if TargetAttachment then
+            break
+        end
+    end
+
+    if TargetAttachment and AccessoryAttachment then
+
+        Handle.CFrame =
+            TargetAttachment.WorldCFrame
+            * AccessoryAttachment.CFrame:Inverse()
+
+    else
+
+        local Root =
+            Character:FindFirstChild("HumanoidRootPart")
+
+        if Root then
+            Handle.CFrame = Root.CFrame
+        end
+    end
+
+    local Weld = Instance.new("WeldConstraint")
+
+    Weld.Part0 = Handle
+    Weld.Part1 =
+        (TargetAttachment and TargetAttachment.Parent)
+        or Character:FindFirstChild("HumanoidRootPart")
+        or Character:FindFirstChild("Head")
+
+    Weld.Parent = Handle
+
+    Accessory.Parent = Character
+end
+
+local function applyAppearance(UserId)
+
+    local Character =
+        LocalPlayer.Character
+        or LocalPlayer.CharacterAdded:Wait()
+
+    local Success, Model = pcall(function()
+        return Players:GetCharacterAppearanceAsync(UserId)
+    end)
+
+    if not Success or not Model then
+        return false, "Unable to load that avatar."
+    end
+
+    clearVisuals(Character)
+
+    -- Body colors
+    local BodyColors =
+        Model:FindFirstChildOfClass("BodyColors")
+
+    if BodyColors then
+        BodyColors:Clone().Parent = Character
+    end
+
+    -- Clothing
+    for _, Item in ipairs(Model:GetChildren()) do
+
+        if Item:IsA("Shirt")
+            or Item:IsA("Pants")
+            or Item:IsA("ShirtGraphic") then
+
+            Item:Clone().Parent = Character
+        end
+    end
+
+    -- Accessories
+    for _, Accessory in ipairs(Model:GetChildren()) do
+
+        if Accessory:IsA("Accessory")
+            or Accessory:IsA("Hat") then
+
+            attachAccessory(
+                Character,
+                Accessory:Clone()
+            )
+        end
+    end
+
+    -- Face
+    local Head =
+        Character:FindFirstChild("Head")
+
+    if Head then
+
+        local Face =
+            Model:FindFirstChild("face", true)
+
+        if Face and Face:IsA("Decal") then
+            Face:Clone().Parent = Head
+        end
+    end
+
+    return true, "Avatar applied successfully."
+end
+
+--========================================================--
+-- GUI
+--========================================================--
+
+local Gui = Instance.new("ScreenGui")
+
+Gui.Name = "KazwareAvatarChanger"
+Gui.ResetOnSpawn = false
+Gui.Parent = PlayerGui
+
+local Main = Instance.new("Frame")
+
+Main.Size = UDim2.fromOffset(420, 330)
+Main.Position =
+    UDim2.new(0.5, -210, 0.5, -165)
+
+Main.BackgroundColor3 =
+    Color3.fromRGB(10, 14, 22)
+
+Main.BorderSizePixel = 0
+Main.Parent = Gui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 14)
+MainCorner.Parent = Main
+
+--========================================================--
+-- HEADER
+--========================================================--
+
+local Header = Instance.new("Frame")
+
+Header.Size = UDim2.new(1, 0, 0, 70)
+
+Header.BackgroundColor3 =
+    Color3.fromRGB(15, 70, 95)
+
+Header.BorderSizePixel = 0
+Header.Parent = Main
+
+local HeaderCorner = Instance.new("UICorner")
+HeaderCorner.CornerRadius = UDim.new(0, 14)
+HeaderCorner.Parent = Header
+
+local Title = Instance.new("TextLabel")
+
+Title.Size =
+    UDim2.new(1, -70, 0, 35)
+
+Title.Position =
+    UDim2.fromOffset(15, 8)
+
+Title.BackgroundTransparency = 1
+
+Title.Text = "KAZWARE"
+
+Title.TextColor3 =
+    Color3.fromRGB(255, 255, 255)
+
+Title.Font =
+    Enum.Font.GothamBlack
+
+Title.TextSize = 25
+
+Title.TextXAlignment =
+    Enum.TextXAlignment.Left
+
+Title.Parent = Header
+
+local Subtitle = Instance.new("TextLabel")
+
+Subtitle.Size =
+    UDim2.new(1, -70, 0, 20)
+
+Subtitle.Position =
+    UDim2.fromOffset(16, 42)
+
+Subtitle.BackgroundTransparency = 1
+
+Subtitle.Text =
+    "AVATAR CUSTOMIZATION"
+
+Subtitle.TextColor3 =
+    Color3.fromRGB(125, 220, 245)
+
+Subtitle.Font =
+    Enum.Font.GothamBold
+
+Subtitle.TextSize = 11
+
+Subtitle.TextXAlignment =
+    Enum.TextXAlignment.Left
+
+Subtitle.Parent = Header
+
+--========================================================--
+-- CLOSE / REMOVE BUTTON
+--========================================================--
+
+local CloseButton = Instance.new("TextButton")
+
+CloseButton.Size =
+    UDim2.fromOffset(36, 36)
+
+CloseButton.Position =
+    UDim2.new(1, -48, 0, 17)
+
+CloseButton.BackgroundColor3 =
+    Color3.fromRGB(25, 45, 58)
+
+CloseButton.BorderSizePixel = 0
+
+CloseButton.Text = "×"
+
+CloseButton.TextColor3 =
+    Color3.fromRGB(255, 255, 255)
+
+CloseButton.Font =
+    Enum.Font.GothamBold
+
+CloseButton.TextSize = 24
+
+CloseButton.Parent = Header
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 8)
+CloseCorner.Parent = CloseButton
+
+CloseButton.MouseButton1Click:Connect(function()
+    Gui:Destroy()
+end)
+
+--========================================================--
+-- USER ID INPUT
+--========================================================--
+
+local Input = Instance.new("TextBox")
+
+Input.Size =
+    UDim2.new(1, -40, 0, 48)
+
+Input.Position =
+    UDim2.fromOffset(20, 95)
+
+Input.BackgroundColor3 =
+    Color3.fromRGB(20, 27, 39)
+
+Input.BorderSizePixel = 0
+
+Input.PlaceholderText =
+    "Enter Roblox User ID..."
+
+Input.PlaceholderColor3 =
+    Color3.fromRGB(120, 130, 145)
+
+Input.Text = ""
+
+Input.TextColor3 =
+    Color3.fromRGB(255, 255, 255)
+
+Input.Font =
+    Enum.Font.Gotham
+
+Input.TextSize = 14
+
+Input.Parent = Main
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 9)
+InputCorner.Parent = Input
+
+--========================================================--
+-- STATUS
+--========================================================--
+
+local Status = Instance.new("TextLabel")
+
+Status.Size =
+    UDim2.new(1, -40, 0, 35)
+
+Status.Position =
+    UDim2.fromOffset(20, 153)
+
+Status.BackgroundTransparency = 1
+
+Status.Text =
+    "Enter a User ID to preview an avatar."
+
+Status.TextColor3 =
+    Color3.fromRGB(150, 165, 180)
+
+Status.Font =
+    Enum.Font.Gotham
+
+Status.TextSize = 12
+
+Status.TextXAlignment =
+    Enum.TextXAlignment.Left
+
+Status.Parent = Main
+
+--========================================================--
+-- APPLY BUTTON
+--========================================================--
+
+local Apply = Instance.new("TextButton")
+
+Apply.Size =
+    UDim2.new(1, -40, 0, 50)
+
+Apply.Position =
+    UDim2.fromOffset(20, 205)
+
+Apply.BackgroundColor3 =
+    Color3.fromRGB(20, 155, 205)
+
+Apply.BorderSizePixel = 0
+
+Apply.Text =
+    "APPLY AVATAR"
+
+Apply.TextColor3 =
+    Color3.fromRGB(255, 255, 255)
+
+Apply.Font =
+    Enum.Font.GothamBold
+
+Apply.TextSize = 14
+
+Apply.Parent = Main
+
+local ApplyCorner = Instance.new("UICorner")
+ApplyCorner.CornerRadius = UDim.new(0, 9)
+ApplyCorner.Parent = Apply
+
+Apply.MouseButton1Click:Connect(function()
+
+    local UserId =
+        tonumber(Input.Text)
+
+    if not UserId then
+
+        Status.Text =
+            "Invalid User ID."
+
+        Status.TextColor3 =
+            Color3.fromRGB(255, 100, 100)
+
+        return
+    end
+
+    Status.Text =
+        "Loading avatar..."
+
+    Status.TextColor3 =
+        Color3.fromRGB(150, 200, 220)
+
+    local Success, Message =
+        applyAppearance(UserId)
+
+    Status.Text = Message
+
+    if Success then
+
+        Status.TextColor3 =
+            Color3.fromRGB(100, 230, 160)
+
+    else
+
+        Status.TextColor3 =
+            Color3.fromRGB(255, 100, 100)
+
+    end
+end)
+
+--========================================================--
+-- DRAGGING
+--========================================================--
+
+local Dragging = false
+local DragStart
+local StartPosition
+
+Header.InputBegan:Connect(function(InputObject)
+
+    if InputObject.UserInputType ==
+        Enum.UserInputType.MouseButton1 then
+
+        Dragging = true
+        DragStart = InputObject.Position
+        StartPosition = Main.Position
+
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(InputObject)
+
+    if InputObject.UserInputType ==
+        Enum.UserInputType.MouseButton1 then
+
+        Dragging = false
+
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(InputObject)
+
+    if Dragging
+        and InputObject.UserInputType ==
+        Enum.UserInputType.MouseMovement then
+
+        local Delta =
+            InputObject.Position - DragStart
+
+        Main.Position =
+            UDim2.new(
+                StartPosition.X.Scale,
+                StartPosition.X.Offset + Delta.X,
+                StartPosition.Y.Scale,
+                StartPosition.Y.Offset + Delta.Y
+            )
+    end
+end)
