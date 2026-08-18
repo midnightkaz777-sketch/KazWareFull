@@ -1,0 +1,71 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+Name = "TriggerBot Test",
+LoadingTitle = "Loading TriggerBot...",
+LoadingSubtitle = "by Grok",
+ConfigurationSaving = {
+Enabled = true,
+FolderName = "TriggerBotTest",
+FileName = "TriggerBotConfig"
+}
+})
+
+local Tab = Window:CreateTab("Main", 4483362458) -- Icon ID
+
+local TriggerSection = Tab:CreateSection("TriggerBot")
+
+local triggerEnabled = false
+local teamCheck = true
+local delay = 0.01
+
+-- Main TriggerBot Loop
+local function checkTrigger()
+while triggerEnabled do
+task.wait(delay)
+
+
+end
+end
+
+Tab:CreateToggle({
+Name = "Enable TriggerBot",
+CurrentValue = false,
+Flag = "TriggerToggle",
+Callback = function(Value)
+triggerEnabled = Value
+if Value then
+task.spawn(checkTrigger)
+Rayfield:Notify({
+Title = "TriggerBot",
+Content = "Enabled - Aim at enemies and hold left click if needed",
+Duration = 3,
+Image = 4483362458
+})
+end
+end,
+})
+
+Tab:CreateSlider({
+Name = "Trigger Delay",
+Range = {0, 0.2},
+Increment = 0.01,
+CurrentValue = 0.01,
+Flag = "DelaySlider",
+Callback = function(Value)
+delay = Value
+end,
+})
+
+Tab:CreateButton({
+Name = "Test Notification",
+Callback = function()
+Rayfield:Notify({
+Title = "Test",
+Content = "TriggerBot script is working correctly!",
+Duration = 4,
+})
+end,
+})
+
+Rayfield:LoadConfiguration()\
