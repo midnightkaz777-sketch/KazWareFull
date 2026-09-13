@@ -1,12 +1,74 @@
 --========================================================--
---                    KAZWARE AVATAR CHANGER              --
+--              KAZWARE AVATAR CHANGER v3.0              --
+--                 NEON BLUE EDITION                     --
 --========================================================--
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+--========================================================--
+-- CONFIG
+--========================================================--
+
+local COLORS = {
+    Background = Color3.fromRGB(6, 9, 18),
+    Main = Color3.fromRGB(10, 15, 28),
+    Panel = Color3.fromRGB(15, 22, 38),
+    Panel2 = Color3.fromRGB(22, 32, 52),
+
+    Blue = Color3.fromRGB(45, 145, 255),
+    BlueDark = Color3.fromRGB(25, 105, 205),
+    BlueLight = Color3.fromRGB(100, 190, 255),
+
+    Text = Color3.fromRGB(255, 255, 255),
+    SubText = Color3.fromRGB(155, 170, 190),
+
+    Green = Color3.fromRGB(34, 197, 94),
+    Red = Color3.fromRGB(239, 68, 68)
+}
+
+--========================================================--
+-- HELPERS
+--========================================================--
+
+local function Corner(Object, Radius)
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, Radius)
+    Corner.Parent = Object
+    return Corner
+end
+
+local function Stroke(Object, Color, Thickness, Transparency)
+    local StrokeObject = Instance.new("UIStroke")
+
+    StrokeObject.Color = Color
+    StrokeObject.Thickness = Thickness or 1
+    StrokeObject.Transparency = Transparency or 0
+
+    StrokeObject.Parent = Object
+
+    return StrokeObject
+end
+
+local function Tween(Object, Time, Properties)
+    local TweenObject = TweenService:Create(
+        Object,
+        TweenInfo.new(
+            Time,
+            Enum.EasingStyle.Quint,
+            Enum.EasingDirection.Out
+        ),
+        Properties
+    )
+
+    TweenObject:Play()
+
+    return TweenObject
+end
 
 --========================================================--
 -- AVATAR FUNCTIONS
@@ -15,6 +77,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local function clearVisuals(Character)
 
     for _, Object in ipairs(Character:GetChildren()) do
+
         if Object:IsA("Accessory")
             or Object:IsA("Hat")
             or Object:IsA("Shirt")
@@ -23,17 +86,21 @@ local function clearVisuals(Character)
             or Object:IsA("CharacterMesh") then
 
             Object:Destroy()
+
         end
     end
 
     local Head = Character:FindFirstChild("Head")
 
     if Head then
+
         for _, Object in ipairs(Head:GetChildren()) do
+
             if Object:IsA("Decal")
                 and Object.Name:lower() == "face" then
 
                 Object:Destroy()
+
             end
         end
     end
@@ -48,7 +115,8 @@ end
 
 local function attachAccessory(Character, Accessory)
 
-    local Handle = Accessory:FindFirstChild("Handle")
+    local Handle =
+        Accessory:FindFirstChild("Handle")
 
     if not Handle then
         return
@@ -68,9 +136,12 @@ local function attachAccessory(Character, Accessory)
                     local Matching =
                         Handle:FindFirstChild(Attachment.Name)
 
-                    if Matching and Matching:IsA("Attachment") then
+                    if Matching
+                        and Matching:IsA("Attachment") then
+
                         TargetAttachment = Attachment
                         AccessoryAttachment = Matching
+
                         break
                     end
                 end
@@ -82,7 +153,8 @@ local function attachAccessory(Character, Accessory)
         end
     end
 
-    if TargetAttachment and AccessoryAttachment then
+    if TargetAttachment
+        and AccessoryAttachment then
 
         Handle.CFrame =
             TargetAttachment.WorldCFrame
@@ -98,9 +170,11 @@ local function attachAccessory(Character, Accessory)
         end
     end
 
-    local Weld = Instance.new("WeldConstraint")
+    local Weld =
+        Instance.new("WeldConstraint")
 
     Weld.Part0 = Handle
+
     Weld.Part1 =
         (TargetAttachment and TargetAttachment.Parent)
         or Character:FindFirstChild("HumanoidRootPart")
@@ -118,11 +192,15 @@ local function applyAppearance(UserId)
         or LocalPlayer.CharacterAdded:Wait()
 
     local Success, Model = pcall(function()
+
         return Players:GetCharacterAppearanceAsync(UserId)
+
     end)
 
     if not Success or not Model then
+
         return false, "Unable to load that avatar."
+
     end
 
     clearVisuals(Character)
@@ -132,7 +210,10 @@ local function applyAppearance(UserId)
         Model:FindFirstChildOfClass("BodyColors")
 
     if BodyColors then
-        BodyColors:Clone().Parent = Character
+
+        BodyColors:Clone().Parent =
+            Character
+
     end
 
     -- Clothing
@@ -142,7 +223,9 @@ local function applyAppearance(UserId)
             or Item:IsA("Pants")
             or Item:IsA("ShirtGraphic") then
 
-            Item:Clone().Parent = Character
+            Item:Clone().Parent =
+                Character
+
         end
     end
 
@@ -156,6 +239,7 @@ local function applyAppearance(UserId)
                 Character,
                 Accessory:Clone()
             )
+
         end
     end
 
@@ -169,7 +253,10 @@ local function applyAppearance(UserId)
             Model:FindFirstChild("face", true)
 
         if Face and Face:IsA("Decal") then
-            Face:Clone().Parent = Head
+
+            Face:Clone().Parent =
+                Head
+
         end
     end
 
@@ -180,236 +267,887 @@ end
 -- GUI
 --========================================================--
 
-local Gui = Instance.new("ScreenGui")
+local Gui =
+    Instance.new("ScreenGui")
 
-Gui.Name = "KazwareAvatarChanger"
-Gui.ResetOnSpawn = false
-Gui.Parent = PlayerGui
+Gui.Name =
+    "KazwareAvatarChanger"
 
-local Main = Instance.new("Frame")
+Gui.ResetOnSpawn =
+    false
 
-Main.Size = UDim2.fromOffset(420, 330)
+Gui.ZIndexBehavior =
+    Enum.ZIndexBehavior.Sibling
+
+Gui.Parent =
+    PlayerGui
+
+--========================================================--
+-- MAIN
+--========================================================--
+
+local Main =
+    Instance.new("Frame")
+
+Main.Size =
+    UDim2.fromOffset(520, 380)
+
 Main.Position =
-    UDim2.new(0.5, -210, 0.5, -165)
+    UDim2.new(
+        0.5,
+        -260,
+        0.5,
+        -190
+    )
 
 Main.BackgroundColor3 =
-    Color3.fromRGB(10, 14, 22)
+    COLORS.Background
 
-Main.BorderSizePixel = 0
-Main.Parent = Gui
+Main.BorderSizePixel =
+    0
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 14)
-MainCorner.Parent = Main
+Main.ClipsDescendants =
+    true
+
+Main.Parent =
+    Gui
+
+Corner(Main, 14)
+
+Stroke(
+    Main,
+    COLORS.Blue,
+    1,
+    0.25
+)
 
 --========================================================--
 -- HEADER
 --========================================================--
 
-local Header = Instance.new("Frame")
+local Header =
+    Instance.new("Frame")
 
-Header.Size = UDim2.new(1, 0, 0, 70)
+Header.Size =
+    UDim2.new(1, 0, 0, 72)
 
 Header.BackgroundColor3 =
-    Color3.fromRGB(15, 70, 95)
+    COLORS.Main
 
-Header.BorderSizePixel = 0
-Header.Parent = Main
+Header.BorderSizePixel =
+    0
 
-local HeaderCorner = Instance.new("UICorner")
-HeaderCorner.CornerRadius = UDim.new(0, 14)
-HeaderCorner.Parent = Header
+Header.Parent =
+    Main
 
-local Title = Instance.new("TextLabel")
+Corner(Header, 14)
+
+-- Header bottom cover
+local HeaderCover =
+    Instance.new("Frame")
+
+HeaderCover.Size =
+    UDim2.new(1, 0, 0, 16)
+
+HeaderCover.Position =
+    UDim2.new(0, 0, 1, -16)
+
+HeaderCover.BackgroundColor3 =
+    COLORS.Main
+
+HeaderCover.BorderSizePixel =
+    0
+
+HeaderCover.Parent =
+    Header
+
+-- Blue accent line
+local Accent =
+    Instance.new("Frame")
+
+Accent.Size =
+    UDim2.new(0, 4, 1, -20)
+
+Accent.Position =
+    UDim2.fromOffset(0, 10)
+
+Accent.BackgroundColor3 =
+    COLORS.Blue
+
+Accent.BorderSizePixel =
+    0
+
+Accent.Parent =
+    Header
+
+Corner(Accent, 4)
+
+-- Title
+local Title =
+    Instance.new("TextLabel")
 
 Title.Size =
-    UDim2.new(1, -70, 0, 35)
+    UDim2.new(1, -100, 0, 32)
 
 Title.Position =
-    UDim2.fromOffset(15, 8)
+    UDim2.fromOffset(20, 10)
 
-Title.BackgroundTransparency = 1
+Title.BackgroundTransparency =
+    1
 
-Title.Text = "KAZWARE"
+Title.Text =
+    "KAZWARE"
 
 Title.TextColor3 =
-    Color3.fromRGB(255, 255, 255)
+    COLORS.Text
 
 Title.Font =
     Enum.Font.GothamBlack
 
-Title.TextSize = 25
+Title.TextSize =
+    23
 
 Title.TextXAlignment =
     Enum.TextXAlignment.Left
 
-Title.Parent = Header
+Title.Parent =
+    Header
 
-local Subtitle = Instance.new("TextLabel")
+-- Subtitle
+local Subtitle =
+    Instance.new("TextLabel")
 
 Subtitle.Size =
-    UDim2.new(1, -70, 0, 20)
+    UDim2.new(1, -100, 0, 20)
 
 Subtitle.Position =
-    UDim2.fromOffset(16, 42)
+    UDim2.fromOffset(21, 40)
 
-Subtitle.BackgroundTransparency = 1
+Subtitle.BackgroundTransparency =
+    1
 
 Subtitle.Text =
     "AVATAR CUSTOMIZATION"
 
 Subtitle.TextColor3 =
-    Color3.fromRGB(125, 220, 245)
+    COLORS.BlueLight
 
 Subtitle.Font =
     Enum.Font.GothamBold
 
-Subtitle.TextSize = 11
+Subtitle.TextSize =
+    10
 
 Subtitle.TextXAlignment =
     Enum.TextXAlignment.Left
 
-Subtitle.Parent = Header
+Subtitle.Parent =
+    Header
 
 --========================================================--
--- CLOSE / REMOVE BUTTON
+-- CLOSE BUTTON
 --========================================================--
 
-local CloseButton = Instance.new("TextButton")
+local CloseButton =
+    Instance.new("TextButton")
 
 CloseButton.Size =
-    UDim2.fromOffset(36, 36)
+    UDim2.fromOffset(38, 38)
 
 CloseButton.Position =
-    UDim2.new(1, -48, 0, 17)
+    UDim2.new(
+        1,
+        -52,
+        0,
+        17
+    )
 
 CloseButton.BackgroundColor3 =
-    Color3.fromRGB(25, 45, 58)
+    COLORS.Panel2
 
-CloseButton.BorderSizePixel = 0
+CloseButton.BorderSizePixel =
+    0
 
-CloseButton.Text = "×"
+CloseButton.Text =
+    "×"
 
 CloseButton.TextColor3 =
-    Color3.fromRGB(255, 255, 255)
+    COLORS.SubText
 
 CloseButton.Font =
     Enum.Font.GothamBold
 
-CloseButton.TextSize = 24
+CloseButton.TextSize =
+    23
 
-CloseButton.Parent = Header
+CloseButton.AutoButtonColor =
+    false
 
-local CloseCorner = Instance.new("UICorner")
-CloseCorner.CornerRadius = UDim.new(0, 8)
-CloseCorner.Parent = CloseButton
+CloseButton.Parent =
+    Header
+
+Corner(CloseButton, 9)
+
+CloseButton.MouseEnter:Connect(function()
+
+    Tween(
+        CloseButton,
+        0.15,
+        {
+            BackgroundColor3 =
+                COLORS.Red,
+
+            TextColor3 =
+                COLORS.Text
+        }
+    )
+
+end)
+
+CloseButton.MouseLeave:Connect(function()
+
+    Tween(
+        CloseButton,
+        0.15,
+        {
+            BackgroundColor3 =
+                COLORS.Panel2,
+
+            TextColor3 =
+                COLORS.SubText
+        }
+    )
+
+end)
 
 CloseButton.MouseButton1Click:Connect(function()
+
+    Tween(
+        Main,
+        0.25,
+        {
+            Size =
+                UDim2.fromOffset(520, 0)
+        }
+    )
+
+    task.wait(0.25)
+
     Gui:Destroy()
+
 end)
+
+--========================================================--
+-- PROFILE PREVIEW
+--========================================================--
+
+local Preview =
+    Instance.new("Frame")
+
+Preview.Size =
+    UDim2.fromOffset(150, 235)
+
+Preview.Position =
+    UDim2.fromOffset(20, 92)
+
+Preview.BackgroundColor3 =
+    COLORS.Panel
+
+Preview.BorderSizePixel =
+    0
+
+Preview.Parent =
+    Main
+
+Corner(Preview, 11)
+
+Stroke(
+    Preview,
+    COLORS.Blue,
+    1,
+    0.75
+)
+
+-- Preview title
+local PreviewTitle =
+    Instance.new("TextLabel")
+
+PreviewTitle.Size =
+    UDim2.new(1, -20, 0, 25)
+
+PreviewTitle.Position =
+    UDim2.fromOffset(10, 10)
+
+PreviewTitle.BackgroundTransparency =
+    1
+
+PreviewTitle.Text =
+    "AVATAR PREVIEW"
+
+PreviewTitle.TextColor3 =
+    COLORS.BlueLight
+
+PreviewTitle.Font =
+    Enum.Font.GothamBold
+
+PreviewTitle.TextSize =
+    10
+
+PreviewTitle.TextXAlignment =
+    Enum.TextXAlignment.Left
+
+PreviewTitle.Parent =
+    Preview
+
+-- Avatar image
+local AvatarImage =
+    Instance.new("ImageLabel")
+
+AvatarImage.Size =
+    UDim2.fromOffset(105, 105)
+
+AvatarImage.Position =
+    UDim2.new(
+        0.5,
+        -52,
+        0,
+        43
+    )
+
+AvatarImage.BackgroundColor3 =
+    COLORS.Panel2
+
+AvatarImage.BorderSizePixel =
+    0
+
+AvatarImage.Image =
+    ""
+
+AvatarImage.Parent =
+    Preview
+
+Corner(AvatarImage, 12)
+
+Stroke(
+    AvatarImage,
+    COLORS.Blue,
+    1,
+    0.6
+)
+
+-- Preview username
+local PreviewName =
+    Instance.new("TextLabel")
+
+PreviewName.Size =
+    UDim2.new(1, -20, 0, 22)
+
+PreviewName.Position =
+    UDim2.fromOffset(10, 158)
+
+PreviewName.BackgroundTransparency =
+    1
+
+PreviewName.Text =
+    "No avatar selected"
+
+PreviewName.TextColor3 =
+    COLORS.Text
+
+PreviewName.Font =
+    Enum.Font.GothamBold
+
+PreviewName.TextSize =
+    12
+
+PreviewName.TextXAlignment =
+    Enum.TextXAlignment.Center
+
+PreviewName.Parent =
+    Preview
+
+-- Preview status
+local PreviewStatus =
+    Instance.new("TextLabel")
+
+PreviewStatus.Size =
+    UDim2.new(1, -20, 0, 32)
+
+PreviewStatus.Position =
+    UDim2.fromOffset(10, 185)
+
+PreviewStatus.BackgroundTransparency =
+    1
+
+PreviewStatus.Text =
+    "Enter a User ID"
+
+PreviewStatus.TextColor3 =
+    COLORS.SubText
+
+PreviewStatus.Font =
+    Enum.Font.Gotham
+
+PreviewStatus.TextSize =
+    10
+
+PreviewStatus.TextWrapped =
+    true
+
+PreviewStatus.TextXAlignment =
+    Enum.TextXAlignment.Center
+
+PreviewStatus.Parent =
+    Preview
+
+--========================================================--
+-- RIGHT PANEL
+--========================================================--
+
+local Controls =
+    Instance.new("Frame")
+
+Controls.Size =
+    UDim2.new(
+        1,
+        -190,
+        1,
+        -105
+    )
+
+Controls.Position =
+    UDim2.fromOffset(
+        185,
+        92
+    )
+
+Controls.BackgroundTransparency =
+    1
+
+Controls.Parent =
+    Main
+
+-- Section title
+local SectionTitle =
+    Instance.new("TextLabel")
+
+SectionTitle.Size =
+    UDim2.new(1, 0, 0, 25)
+
+SectionTitle.BackgroundTransparency =
+    1
+
+SectionTitle.Text =
+    "CHANGE AVATAR"
+
+SectionTitle.TextColor3 =
+    COLORS.Text
+
+SectionTitle.Font =
+    Enum.Font.GothamBold
+
+SectionTitle.TextSize =
+    15
+
+SectionTitle.TextXAlignment =
+    Enum.TextXAlignment.Left
+
+SectionTitle.Parent =
+    Controls
+
+-- Description
+local Description =
+    Instance.new("TextLabel")
+
+Description.Size =
+    UDim2.new(1, 0, 0, 40)
+
+Description.Position =
+    UDim2.fromOffset(0, 27)
+
+Description.BackgroundTransparency =
+    1
+
+Description.Text =
+    "Enter a Roblox User ID to preview and apply that avatar."
+
+Description.TextColor3 =
+    COLORS.SubText
+
+Description.Font =
+    Enum.Font.Gotham
+
+Description.TextSize =
+    11
+
+Description.TextWrapped =
+    true
+
+Description.TextXAlignment =
+    Enum.TextXAlignment.Left
+
+Description.Parent =
+    Controls
 
 --========================================================--
 -- USER ID INPUT
 --========================================================--
 
-local Input = Instance.new("TextBox")
+local Input =
+    Instance.new("TextBox")
 
 Input.Size =
-    UDim2.new(1, -40, 0, 48)
+    UDim2.new(1, 0, 0, 46)
 
 Input.Position =
-    UDim2.fromOffset(20, 95)
+    UDim2.fromOffset(0, 72)
 
 Input.BackgroundColor3 =
-    Color3.fromRGB(20, 27, 39)
+    COLORS.Panel
 
-Input.BorderSizePixel = 0
+Input.BorderSizePixel =
+    0
 
 Input.PlaceholderText =
     "Enter Roblox User ID..."
 
 Input.PlaceholderColor3 =
-    Color3.fromRGB(120, 130, 145)
+    COLORS.SubText
 
-Input.Text = ""
+Input.Text =
+    ""
 
 Input.TextColor3 =
-    Color3.fromRGB(255, 255, 255)
+    COLORS.Text
 
 Input.Font =
-    Enum.Font.Gotham
+    Enum.Font.GothamMedium
 
-Input.TextSize = 14
+Input.TextSize =
+    13
 
-Input.Parent = Main
+Input.ClearTextOnFocus =
+    false
 
-local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 9)
-InputCorner.Parent = Input
+Input.Parent =
+    Controls
+
+Corner(Input, 9)
+
+Stroke(
+    Input,
+    COLORS.Blue,
+    1,
+    0.75
+)
 
 --========================================================--
 -- STATUS
 --========================================================--
 
-local Status = Instance.new("TextLabel")
+local Status =
+    Instance.new("TextLabel")
 
 Status.Size =
-    UDim2.new(1, -40, 0, 35)
+    UDim2.new(1, 0, 0, 42)
 
 Status.Position =
-    UDim2.fromOffset(20, 153)
+    UDim2.fromOffset(0, 128)
 
-Status.BackgroundTransparency = 1
+Status.BackgroundColor3 =
+    COLORS.Panel
+
+Status.BorderSizePixel =
+    0
 
 Status.Text =
-    "Enter a User ID to preview an avatar."
+    "●  Enter a User ID to get started."
 
 Status.TextColor3 =
-    Color3.fromRGB(150, 165, 180)
+    COLORS.SubText
 
 Status.Font =
-    Enum.Font.Gotham
+    Enum.Font.GothamMedium
 
-Status.TextSize = 12
+Status.TextSize =
+    11
 
 Status.TextXAlignment =
     Enum.TextXAlignment.Left
 
-Status.Parent = Main
+Status.Parent =
+    Controls
+
+Corner(Status, 9)
+
+--========================================================--
+-- PREVIEW BUTTON
+--========================================================--
+
+local PreviewButton =
+    Instance.new("TextButton")
+
+PreviewButton.Size =
+    UDim2.new(
+        0.48,
+        -5,
+        0,
+        45
+    )
+
+PreviewButton.Position =
+    UDim2.fromOffset(
+        0,
+        180
+    )
+
+PreviewButton.BackgroundColor3 =
+    COLORS.Panel2
+
+PreviewButton.BorderSizePixel =
+    0
+
+PreviewButton.Text =
+    "PREVIEW"
+
+PreviewButton.TextColor3 =
+    COLORS.BlueLight
+
+PreviewButton.Font =
+    Enum.Font.GothamBold
+
+PreviewButton.TextSize =
+    11
+
+PreviewButton.AutoButtonColor =
+    false
+
+PreviewButton.Parent =
+    Controls
+
+Corner(PreviewButton, 9)
+
+Stroke(
+    PreviewButton,
+    COLORS.Blue,
+    1,
+    0.5
+)
 
 --========================================================--
 -- APPLY BUTTON
 --========================================================--
 
-local Apply = Instance.new("TextButton")
+local Apply =
+    Instance.new("TextButton")
 
 Apply.Size =
-    UDim2.new(1, -40, 0, 50)
+    UDim2.new(
+        0.52,
+        -5,
+        0,
+        45
+    )
 
 Apply.Position =
-    UDim2.fromOffset(20, 205)
+    UDim2.new(
+        0.48,
+        5,
+        0,
+        180
+    )
 
 Apply.BackgroundColor3 =
-    Color3.fromRGB(20, 155, 205)
+    COLORS.Blue
 
-Apply.BorderSizePixel = 0
+Apply.BorderSizePixel =
+    0
 
 Apply.Text =
     "APPLY AVATAR"
 
 Apply.TextColor3 =
-    Color3.fromRGB(255, 255, 255)
+    COLORS.Text
 
 Apply.Font =
     Enum.Font.GothamBold
 
-Apply.TextSize = 14
+Apply.TextSize =
+    11
 
-Apply.Parent = Main
+Apply.AutoButtonColor =
+    false
 
-local ApplyCorner = Instance.new("UICorner")
-ApplyCorner.CornerRadius = UDim.new(0, 9)
-ApplyCorner.Parent = Apply
+Apply.Parent =
+    Controls
+
+Corner(Apply, 9)
+
+--========================================================--
+-- BUTTON ANIMATIONS
+--========================================================--
+
+PreviewButton.MouseEnter:Connect(function()
+
+    Tween(
+        PreviewButton,
+        0.15,
+        {
+            BackgroundColor3 =
+                COLORS.BlueDark,
+
+            TextColor3 =
+                COLORS.Text
+        }
+    )
+
+end)
+
+PreviewButton.MouseLeave:Connect(function()
+
+    Tween(
+        PreviewButton,
+        0.15,
+        {
+            BackgroundColor3 =
+                COLORS.Panel2,
+
+            TextColor3 =
+                COLORS.BlueLight
+        }
+    )
+
+end)
+
+Apply.MouseEnter:Connect(function()
+
+    Tween(
+        Apply,
+        0.15,
+        {
+            BackgroundColor3 =
+                COLORS.BlueLight
+        }
+    )
+
+end)
+
+Apply.MouseLeave:Connect(function()
+
+    Tween(
+        Apply,
+        0.15,
+        {
+            BackgroundColor3 =
+                COLORS.Blue
+        }
+    )
+
+end)
+
+--========================================================--
+-- PREVIEW AVATAR
+--========================================================--
+
+local function previewAvatar(UserId)
+
+    local Success, Image =
+        pcall(function()
+
+            return Players:GetUserThumbnailAsync(
+                UserId,
+                Enum.ThumbnailType.AvatarThumbnail,
+                Enum.ThumbnailSize.Size420x420
+            )
+
+        end)
+
+    if not Success or not Image then
+
+        return false
+
+    end
+
+    AvatarImage.Image =
+        Image
+
+    local NameSuccess, Username =
+        pcall(function()
+
+            return Players:GetNameFromUserIdAsync(
+                UserId
+            )
+
+        end)
+
+    if NameSuccess then
+
+        PreviewName.Text =
+            "@" .. Username
+
+    else
+
+        PreviewName.Text =
+            "User ID: " .. tostring(UserId)
+
+    end
+
+    PreviewStatus.Text =
+        "Avatar loaded successfully."
+
+    PreviewStatus.TextColor3 =
+        COLORS.Green
+
+    return true
+end
+
+PreviewButton.MouseButton1Click:Connect(function()
+
+    local UserId =
+        tonumber(Input.Text)
+
+    if not UserId then
+
+        Status.Text =
+            "●  Invalid User ID."
+
+        Status.TextColor3 =
+            COLORS.Red
+
+        return
+    end
+
+    Status.Text =
+        "●  Loading avatar preview..."
+
+    Status.TextColor3 =
+        COLORS.BlueLight
+
+    local Success =
+        previewAvatar(UserId)
+
+    if Success then
+
+        Status.Text =
+            "●  Preview loaded."
+
+        Status.TextColor3 =
+            COLORS.Green
+
+    else
+
+        Status.Text =
+            "●  Could not load that avatar."
+
+        Status.TextColor3 =
+            COLORS.Red
+
+    end
+end)
+
+--========================================================--
+-- APPLY AVATAR
+--========================================================--
 
 Apply.MouseButton1Click:Connect(function()
 
@@ -419,34 +1157,37 @@ Apply.MouseButton1Click:Connect(function()
     if not UserId then
 
         Status.Text =
-            "Invalid User ID."
+            "●  Invalid User ID."
 
         Status.TextColor3 =
-            Color3.fromRGB(255, 100, 100)
+            COLORS.Red
 
         return
     end
 
     Status.Text =
-        "Loading avatar..."
+        "●  Applying avatar..."
 
     Status.TextColor3 =
-        Color3.fromRGB(150, 200, 220)
+        COLORS.BlueLight
 
     local Success, Message =
         applyAppearance(UserId)
 
-    Status.Text = Message
+    Status.Text =
+        "●  " .. Message
 
     if Success then
 
         Status.TextColor3 =
-            Color3.fromRGB(100, 230, 160)
+            COLORS.Green
+
+        previewAvatar(UserId)
 
     else
 
         Status.TextColor3 =
-            Color3.fromRGB(255, 100, 100)
+            COLORS.Red
 
     end
 end)
@@ -455,8 +1196,11 @@ end)
 -- DRAGGING
 --========================================================--
 
-local Dragging = false
+local Dragging =
+    false
+
 local DragStart
+
 local StartPosition
 
 Header.InputBegan:Connect(function(InputObject)
@@ -464,9 +1208,14 @@ Header.InputBegan:Connect(function(InputObject)
     if InputObject.UserInputType ==
         Enum.UserInputType.MouseButton1 then
 
-        Dragging = true
-        DragStart = InputObject.Position
-        StartPosition = Main.Position
+        Dragging =
+            true
+
+        DragStart =
+            InputObject.Position
+
+        StartPosition =
+            Main.Position
 
     end
 end)
@@ -476,7 +1225,8 @@ UserInputService.InputEnded:Connect(function(InputObject)
     if InputObject.UserInputType ==
         Enum.UserInputType.MouseButton1 then
 
-        Dragging = false
+        Dragging =
+            false
 
     end
 end)
@@ -488,7 +1238,8 @@ UserInputService.InputChanged:Connect(function(InputObject)
         Enum.UserInputType.MouseMovement then
 
         local Delta =
-            InputObject.Position - DragStart
+            InputObject.Position -
+            DragStart
 
         Main.Position =
             UDim2.new(
@@ -499,3 +1250,26 @@ UserInputService.InputChanged:Connect(function(InputObject)
             )
     end
 end)
+
+--========================================================--
+-- OPEN ANIMATION
+--========================================================--
+
+local OriginalSize =
+    Main.Size
+
+Main.Size =
+    UDim2.fromOffset(
+        520,
+        0
+    )
+
+Tween(
+    Main,
+    0.4,
+    {
+        Size = OriginalSize
+    }
+)
+
+print("KAZWARE Avatar Changer v3.0 loaded.")
