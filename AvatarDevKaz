@@ -1,5 +1,5 @@
 --========================================================--
---              KAZWARE AVATAR CHANGER v3.0              --
+--              DEVKAZ AVATAR CHANGER v3.0               --
 --                 NEON BLUE EDITION                     --
 --========================================================--
 
@@ -36,34 +36,54 @@ local COLORS = {
 --========================================================--
 
 local function Corner(Object, Radius)
-    local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, Radius)
-    Corner.Parent = Object
-    return Corner
+    local CornerObject = Instance.new("UICorner")
+
+    CornerObject.CornerRadius =
+        UDim.new(0, Radius)
+
+    CornerObject.Parent = Object
+
+    return CornerObject
 end
 
-local function Stroke(Object, Color, Thickness, Transparency)
-    local StrokeObject = Instance.new("UIStroke")
+local function Stroke(
+    Object,
+    Color,
+    Thickness,
+    Transparency
+)
+
+    local StrokeObject =
+        Instance.new("UIStroke")
 
     StrokeObject.Color = Color
-    StrokeObject.Thickness = Thickness or 1
-    StrokeObject.Transparency = Transparency or 0
+    StrokeObject.Thickness =
+        Thickness or 1
+
+    StrokeObject.Transparency =
+        Transparency or 0
 
     StrokeObject.Parent = Object
 
     return StrokeObject
 end
 
-local function Tween(Object, Time, Properties)
-    local TweenObject = TweenService:Create(
-        Object,
-        TweenInfo.new(
-            Time,
-            Enum.EasingStyle.Quint,
-            Enum.EasingDirection.Out
-        ),
-        Properties
-    )
+local function Tween(
+    Object,
+    Time,
+    Properties
+)
+
+    local TweenObject =
+        TweenService:Create(
+            Object,
+            TweenInfo.new(
+                Time,
+                Enum.EasingStyle.Quint,
+                Enum.EasingDirection.Out
+            ),
+            Properties
+        )
 
     TweenObject:Play()
 
@@ -76,7 +96,8 @@ end
 
 local function clearVisuals(Character)
 
-    for _, Object in ipairs(Character:GetChildren()) do
+    for _, Object in
+        ipairs(Character:GetChildren()) do
 
         if Object:IsA("Accessory")
             or Object:IsA("Hat")
@@ -90,11 +111,13 @@ local function clearVisuals(Character)
         end
     end
 
-    local Head = Character:FindFirstChild("Head")
+    local Head =
+        Character:FindFirstChild("Head")
 
     if Head then
 
-        for _, Object in ipairs(Head:GetChildren()) do
+        for _, Object in
+            ipairs(Head:GetChildren()) do
 
             if Object:IsA("Decal")
                 and Object.Name:lower() == "face" then
@@ -106,14 +129,19 @@ local function clearVisuals(Character)
     end
 
     local BodyColors =
-        Character:FindFirstChildOfClass("BodyColors")
+        Character:FindFirstChildOfClass(
+            "BodyColors"
+        )
 
     if BodyColors then
         BodyColors:Destroy()
     end
 end
 
-local function attachAccessory(Character, Accessory)
+local function attachAccessory(
+    Character,
+    Accessory
+)
 
     local Handle =
         Accessory:FindFirstChild("Handle")
@@ -125,22 +153,31 @@ local function attachAccessory(Character, Accessory)
     local TargetAttachment
     local AccessoryAttachment
 
-    for _, Part in ipairs(Character:GetChildren()) do
+    for _, Part in
+        ipairs(Character:GetChildren()) do
 
         if Part:IsA("BasePart") then
 
-            for _, Attachment in ipairs(Part:GetChildren()) do
+            for _, Attachment in
+                ipairs(Part:GetChildren()) do
 
                 if Attachment:IsA("Attachment") then
 
                     local Matching =
-                        Handle:FindFirstChild(Attachment.Name)
+                        Handle:FindFirstChild(
+                            Attachment.Name
+                        )
 
                     if Matching
-                        and Matching:IsA("Attachment") then
+                        and Matching:IsA(
+                            "Attachment"
+                        ) then
 
-                        TargetAttachment = Attachment
-                        AccessoryAttachment = Matching
+                        TargetAttachment =
+                            Attachment
+
+                        AccessoryAttachment =
+                            Matching
 
                         break
                     end
@@ -163,26 +200,37 @@ local function attachAccessory(Character, Accessory)
     else
 
         local Root =
-            Character:FindFirstChild("HumanoidRootPart")
+            Character:FindFirstChild(
+                "HumanoidRootPart"
+            )
 
         if Root then
-            Handle.CFrame = Root.CFrame
+            Handle.CFrame =
+                Root.CFrame
         end
     end
 
     local Weld =
         Instance.new("WeldConstraint")
 
-    Weld.Part0 = Handle
+    Weld.Part0 =
+        Handle
 
     Weld.Part1 =
-        (TargetAttachment and TargetAttachment.Parent)
-        or Character:FindFirstChild("HumanoidRootPart")
-        or Character:FindFirstChild("Head")
+        (TargetAttachment
+            and TargetAttachment.Parent)
+        or Character:FindFirstChild(
+            "HumanoidRootPart"
+        )
+        or Character:FindFirstChild(
+            "Head"
+        )
 
-    Weld.Parent = Handle
+    Weld.Parent =
+        Handle
 
-    Accessory.Parent = Character
+    Accessory.Parent =
+        Character
 end
 
 local function applyAppearance(UserId)
@@ -191,15 +239,19 @@ local function applyAppearance(UserId)
         LocalPlayer.Character
         or LocalPlayer.CharacterAdded:Wait()
 
-    local Success, Model = pcall(function()
+    local Success, Model =
+        pcall(function()
 
-        return Players:GetCharacterAppearanceAsync(UserId)
+            return Players:GetCharacterAppearanceAsync(
+                UserId
+            )
 
-    end)
+        end)
 
     if not Success or not Model then
 
-        return false, "Unable to load that avatar."
+        return false,
+            "Unable to load that avatar."
 
     end
 
@@ -207,7 +259,9 @@ local function applyAppearance(UserId)
 
     -- Body colors
     local BodyColors =
-        Model:FindFirstChildOfClass("BodyColors")
+        Model:FindFirstChildOfClass(
+            "BodyColors"
+        )
 
     if BodyColors then
 
@@ -217,7 +271,8 @@ local function applyAppearance(UserId)
     end
 
     -- Clothing
-    for _, Item in ipairs(Model:GetChildren()) do
+    for _, Item in
+        ipairs(Model:GetChildren()) do
 
         if Item:IsA("Shirt")
             or Item:IsA("Pants")
@@ -230,7 +285,8 @@ local function applyAppearance(UserId)
     end
 
     -- Accessories
-    for _, Accessory in ipairs(Model:GetChildren()) do
+    for _, Accessory in
+        ipairs(Model:GetChildren()) do
 
         if Accessory:IsA("Accessory")
             or Accessory:IsA("Hat") then
@@ -250,9 +306,13 @@ local function applyAppearance(UserId)
     if Head then
 
         local Face =
-            Model:FindFirstChild("face", true)
+            Model:FindFirstChild(
+                "face",
+                true
+            )
 
-        if Face and Face:IsA("Decal") then
+        if Face
+            and Face:IsA("Decal") then
 
             Face:Clone().Parent =
                 Head
@@ -260,7 +320,10 @@ local function applyAppearance(UserId)
         end
     end
 
-    return true, "Avatar applied successfully."
+    Model:Destroy()
+
+    return true,
+        "Avatar applied successfully."
 end
 
 --========================================================--
@@ -271,7 +334,7 @@ local Gui =
     Instance.new("ScreenGui")
 
 Gui.Name =
-    "KazwareAvatarChanger"
+    "DevKazAvatarChanger"
 
 Gui.ResetOnSpawn =
     false
@@ -290,7 +353,10 @@ local Main =
     Instance.new("Frame")
 
 Main.Size =
-    UDim2.fromOffset(520, 380)
+    UDim2.fromOffset(
+        520,
+        380
+    )
 
 Main.Position =
     UDim2.new(
@@ -312,7 +378,10 @@ Main.ClipsDescendants =
 Main.Parent =
     Gui
 
-Corner(Main, 14)
+Corner(
+    Main,
+    14
+)
 
 Stroke(
     Main,
@@ -329,7 +398,12 @@ local Header =
     Instance.new("Frame")
 
 Header.Size =
-    UDim2.new(1, 0, 0, 72)
+    UDim2.new(
+        1,
+        0,
+        0,
+        72
+    )
 
 Header.BackgroundColor3 =
     COLORS.Main
@@ -340,17 +414,29 @@ Header.BorderSizePixel =
 Header.Parent =
     Main
 
-Corner(Header, 14)
+Corner(
+    Header,
+    14
+)
 
--- Header bottom cover
 local HeaderCover =
     Instance.new("Frame")
 
 HeaderCover.Size =
-    UDim2.new(1, 0, 0, 16)
+    UDim2.new(
+        1,
+        0,
+        0,
+        16
+    )
 
 HeaderCover.Position =
-    UDim2.new(0, 0, 1, -16)
+    UDim2.new(
+        0,
+        0,
+        1,
+        -16
+    )
 
 HeaderCover.BackgroundColor3 =
     COLORS.Main
@@ -361,15 +447,26 @@ HeaderCover.BorderSizePixel =
 HeaderCover.Parent =
     Header
 
--- Blue accent line
+--========================================================--
+-- BLUE ACCENT
+--========================================================--
+
 local Accent =
     Instance.new("Frame")
 
 Accent.Size =
-    UDim2.new(0, 4, 1, -20)
+    UDim2.new(
+        0,
+        4,
+        1,
+        -20
+    )
 
 Accent.Position =
-    UDim2.fromOffset(0, 10)
+    UDim2.fromOffset(
+        0,
+        10
+    )
 
 Accent.BackgroundColor3 =
     COLORS.Blue
@@ -380,23 +477,37 @@ Accent.BorderSizePixel =
 Accent.Parent =
     Header
 
-Corner(Accent, 4)
+Corner(
+    Accent,
+    4
+)
 
--- Title
+--========================================================--
+-- TITLE
+--========================================================--
+
 local Title =
     Instance.new("TextLabel")
 
 Title.Size =
-    UDim2.new(1, -100, 0, 32)
+    UDim2.new(
+        1,
+        -100,
+        0,
+        32
+    )
 
 Title.Position =
-    UDim2.fromOffset(20, 10)
+    UDim2.fromOffset(
+        20,
+        10
+    )
 
 Title.BackgroundTransparency =
     1
 
 Title.Text =
-    "KAZWARE"
+    "DEVKAZ"
 
 Title.TextColor3 =
     COLORS.Text
@@ -413,15 +524,26 @@ Title.TextXAlignment =
 Title.Parent =
     Header
 
--- Subtitle
+--========================================================--
+-- SUBTITLE
+--========================================================--
+
 local Subtitle =
     Instance.new("TextLabel")
 
 Subtitle.Size =
-    UDim2.new(1, -100, 0, 20)
+    UDim2.new(
+        1,
+        -100,
+        0,
+        20
+    )
 
 Subtitle.Position =
-    UDim2.fromOffset(21, 40)
+    UDim2.fromOffset(
+        21,
+        40
+    )
 
 Subtitle.BackgroundTransparency =
     1
@@ -452,7 +574,10 @@ local CloseButton =
     Instance.new("TextButton")
 
 CloseButton.Size =
-    UDim2.fromOffset(38, 38)
+    UDim2.fromOffset(
+        38,
+        38
+    )
 
 CloseButton.Position =
     UDim2.new(
@@ -486,56 +611,68 @@ CloseButton.AutoButtonColor =
 CloseButton.Parent =
     Header
 
-Corner(CloseButton, 9)
+Corner(
+    CloseButton,
+    9
+)
 
-CloseButton.MouseEnter:Connect(function()
+CloseButton.MouseEnter:Connect(
+    function()
 
-    Tween(
-        CloseButton,
-        0.15,
-        {
-            BackgroundColor3 =
-                COLORS.Red,
+        Tween(
+            CloseButton,
+            0.15,
+            {
+                BackgroundColor3 =
+                    COLORS.Red,
 
-            TextColor3 =
-                COLORS.Text
-        }
-    )
+                TextColor3 =
+                    COLORS.Text
+            }
+        )
 
-end)
+    end
+)
 
-CloseButton.MouseLeave:Connect(function()
+CloseButton.MouseLeave:Connect(
+    function()
 
-    Tween(
-        CloseButton,
-        0.15,
-        {
-            BackgroundColor3 =
-                COLORS.Panel2,
+        Tween(
+            CloseButton,
+            0.15,
+            {
+                BackgroundColor3 =
+                    COLORS.Panel2,
 
-            TextColor3 =
-                COLORS.SubText
-        }
-    )
+                TextColor3 =
+                    COLORS.SubText
+            }
+        )
 
-end)
+    end
+)
 
-CloseButton.MouseButton1Click:Connect(function()
+CloseButton.MouseButton1Click:Connect(
+    function()
 
-    Tween(
-        Main,
-        0.25,
-        {
-            Size =
-                UDim2.fromOffset(520, 0)
-        }
-    )
+        Tween(
+            Main,
+            0.25,
+            {
+                Size =
+                    UDim2.fromOffset(
+                        520,
+                        0
+                    )
+            }
+        )
 
-    task.wait(0.25)
+        task.wait(0.25)
 
-    Gui:Destroy()
+        Gui:Destroy()
 
-end)
+    end
+)
 
 --========================================================--
 -- PROFILE PREVIEW
@@ -545,10 +682,16 @@ local Preview =
     Instance.new("Frame")
 
 Preview.Size =
-    UDim2.fromOffset(150, 235)
+    UDim2.fromOffset(
+        150,
+        235
+    )
 
 Preview.Position =
-    UDim2.fromOffset(20, 92)
+    UDim2.fromOffset(
+        20,
+        92
+    )
 
 Preview.BackgroundColor3 =
     COLORS.Panel
@@ -559,7 +702,10 @@ Preview.BorderSizePixel =
 Preview.Parent =
     Main
 
-Corner(Preview, 11)
+Corner(
+    Preview,
+    11
+)
 
 Stroke(
     Preview,
@@ -573,10 +719,18 @@ local PreviewTitle =
     Instance.new("TextLabel")
 
 PreviewTitle.Size =
-    UDim2.new(1, -20, 0, 25)
+    UDim2.new(
+        1,
+        -20,
+        0,
+        25
+    )
 
 PreviewTitle.Position =
-    UDim2.fromOffset(10, 10)
+    UDim2.fromOffset(
+        10,
+        10
+    )
 
 PreviewTitle.BackgroundTransparency =
     1
@@ -604,7 +758,10 @@ local AvatarImage =
     Instance.new("ImageLabel")
 
 AvatarImage.Size =
-    UDim2.fromOffset(105, 105)
+    UDim2.fromOffset(
+        105,
+        105
+    )
 
 AvatarImage.Position =
     UDim2.new(
@@ -626,7 +783,10 @@ AvatarImage.Image =
 AvatarImage.Parent =
     Preview
 
-Corner(AvatarImage, 12)
+Corner(
+    AvatarImage,
+    12
+)
 
 Stroke(
     AvatarImage,
@@ -640,10 +800,18 @@ local PreviewName =
     Instance.new("TextLabel")
 
 PreviewName.Size =
-    UDim2.new(1, -20, 0, 22)
+    UDim2.new(
+        1,
+        -20,
+        0,
+        22
+    )
 
 PreviewName.Position =
-    UDim2.fromOffset(10, 158)
+    UDim2.fromOffset(
+        10,
+        158
+    )
 
 PreviewName.BackgroundTransparency =
     1
@@ -671,10 +839,18 @@ local PreviewStatus =
     Instance.new("TextLabel")
 
 PreviewStatus.Size =
-    UDim2.new(1, -20, 0, 32)
+    UDim2.new(
+        1,
+        -20,
+        0,
+        32
+    )
 
 PreviewStatus.Position =
-    UDim2.fromOffset(10, 185)
+    UDim2.fromOffset(
+        10,
+        185
+    )
 
 PreviewStatus.BackgroundTransparency =
     1
@@ -732,7 +908,12 @@ local SectionTitle =
     Instance.new("TextLabel")
 
 SectionTitle.Size =
-    UDim2.new(1, 0, 0, 25)
+    UDim2.new(
+        1,
+        0,
+        0,
+        25
+    )
 
 SectionTitle.BackgroundTransparency =
     1
@@ -760,10 +941,18 @@ local Description =
     Instance.new("TextLabel")
 
 Description.Size =
-    UDim2.new(1, 0, 0, 40)
+    UDim2.new(
+        1,
+        0,
+        0,
+        40
+    )
 
 Description.Position =
-    UDim2.fromOffset(0, 27)
+    UDim2.fromOffset(
+        0,
+        27
+    )
 
 Description.BackgroundTransparency =
     1
@@ -797,10 +986,18 @@ local Input =
     Instance.new("TextBox")
 
 Input.Size =
-    UDim2.new(1, 0, 0, 46)
+    UDim2.new(
+        1,
+        0,
+        0,
+        46
+    )
 
 Input.Position =
-    UDim2.fromOffset(0, 72)
+    UDim2.fromOffset(
+        0,
+        72
+    )
 
 Input.BackgroundColor3 =
     COLORS.Panel
@@ -832,7 +1029,10 @@ Input.ClearTextOnFocus =
 Input.Parent =
     Controls
 
-Corner(Input, 9)
+Corner(
+    Input,
+    9
+)
 
 Stroke(
     Input,
@@ -849,10 +1049,18 @@ local Status =
     Instance.new("TextLabel")
 
 Status.Size =
-    UDim2.new(1, 0, 0, 42)
+    UDim2.new(
+        1,
+        0,
+        0,
+        42
+    )
 
 Status.Position =
-    UDim2.fromOffset(0, 128)
+    UDim2.fromOffset(
+        0,
+        128
+    )
 
 Status.BackgroundColor3 =
     COLORS.Panel
@@ -878,7 +1086,10 @@ Status.TextXAlignment =
 Status.Parent =
     Controls
 
-Corner(Status, 9)
+Corner(
+    Status,
+    9
+)
 
 --========================================================--
 -- PREVIEW BUTTON
@@ -925,7 +1136,10 @@ PreviewButton.AutoButtonColor =
 PreviewButton.Parent =
     Controls
 
-Corner(PreviewButton, 9)
+Corner(
+    PreviewButton,
+    9
+)
 
 Stroke(
     PreviewButton,
@@ -981,69 +1195,80 @@ Apply.AutoButtonColor =
 Apply.Parent =
     Controls
 
-Corner(Apply, 9)
+Corner(
+    Apply,
+    9
+)
 
 --========================================================--
 -- BUTTON ANIMATIONS
 --========================================================--
 
-PreviewButton.MouseEnter:Connect(function()
+PreviewButton.MouseEnter:Connect(
+    function()
 
-    Tween(
-        PreviewButton,
-        0.15,
-        {
-            BackgroundColor3 =
-                COLORS.BlueDark,
+        Tween(
+            PreviewButton,
+            0.15,
+            {
+                BackgroundColor3 =
+                    COLORS.BlueDark,
 
-            TextColor3 =
-                COLORS.Text
-        }
-    )
+                TextColor3 =
+                    COLORS.Text
+            }
+        )
 
-end)
+    end
+)
 
-PreviewButton.MouseLeave:Connect(function()
+PreviewButton.MouseLeave:Connect(
+    function()
 
-    Tween(
-        PreviewButton,
-        0.15,
-        {
-            BackgroundColor3 =
-                COLORS.Panel2,
+        Tween(
+            PreviewButton,
+            0.15,
+            {
+                BackgroundColor3 =
+                    COLORS.Panel2,
 
-            TextColor3 =
-                COLORS.BlueLight
-        }
-    )
+                TextColor3 =
+                    COLORS.BlueLight
+            }
+        )
 
-end)
+    end
+)
 
-Apply.MouseEnter:Connect(function()
+Apply.MouseEnter:Connect(
+    function()
 
-    Tween(
-        Apply,
-        0.15,
-        {
-            BackgroundColor3 =
-                COLORS.BlueLight
-        }
-    )
+        Tween(
+            Apply,
+            0.15,
+            {
+                BackgroundColor3 =
+                    COLORS.BlueLight
+            }
+        )
 
-end)
+    end
+)
 
-Apply.MouseLeave:Connect(function()
+Apply.MouseLeave:Connect(
+    function()
 
-    Tween(
-        Apply,
-        0.15,
-        {
-            BackgroundColor3 =
-                COLORS.Blue
-        }
-    )
+        Tween(
+            Apply,
+            0.15,
+            {
+                BackgroundColor3 =
+                    COLORS.Blue
+            }
+        )
 
-end)
+    end
+)
 
 --========================================================--
 -- PREVIEW AVATAR
@@ -1063,9 +1288,7 @@ local function previewAvatar(UserId)
         end)
 
     if not Success or not Image then
-
         return false
-
     end
 
     AvatarImage.Image =
@@ -1088,7 +1311,8 @@ local function previewAvatar(UserId)
     else
 
         PreviewName.Text =
-            "User ID: " .. tostring(UserId)
+            "User ID: " ..
+            tostring(UserId)
 
     end
 
@@ -1101,96 +1325,100 @@ local function previewAvatar(UserId)
     return true
 end
 
-PreviewButton.MouseButton1Click:Connect(function()
+PreviewButton.MouseButton1Click:Connect(
+    function()
 
-    local UserId =
-        tonumber(Input.Text)
+        local UserId =
+            tonumber(Input.Text)
 
-    if not UserId then
+        if not UserId then
+
+            Status.Text =
+                "●  Invalid User ID."
+
+            Status.TextColor3 =
+                COLORS.Red
+
+            return
+        end
 
         Status.Text =
-            "●  Invalid User ID."
+            "●  Loading avatar preview..."
 
         Status.TextColor3 =
-            COLORS.Red
+            COLORS.BlueLight
 
-        return
+        local Success =
+            previewAvatar(UserId)
+
+        if Success then
+
+            Status.Text =
+                "●  Preview loaded."
+
+            Status.TextColor3 =
+                COLORS.Green
+
+        else
+
+            Status.Text =
+                "●  Could not load that avatar."
+
+            Status.TextColor3 =
+                COLORS.Red
+
+        end
     end
-
-    Status.Text =
-        "●  Loading avatar preview..."
-
-    Status.TextColor3 =
-        COLORS.BlueLight
-
-    local Success =
-        previewAvatar(UserId)
-
-    if Success then
-
-        Status.Text =
-            "●  Preview loaded."
-
-        Status.TextColor3 =
-            COLORS.Green
-
-    else
-
-        Status.Text =
-            "●  Could not load that avatar."
-
-        Status.TextColor3 =
-            COLORS.Red
-
-    end
-end)
+)
 
 --========================================================--
 -- APPLY AVATAR
 --========================================================--
 
-Apply.MouseButton1Click:Connect(function()
+Apply.MouseButton1Click:Connect(
+    function()
 
-    local UserId =
-        tonumber(Input.Text)
+        local UserId =
+            tonumber(Input.Text)
 
-    if not UserId then
+        if not UserId then
+
+            Status.Text =
+                "●  Invalid User ID."
+
+            Status.TextColor3 =
+                COLORS.Red
+
+            return
+        end
 
         Status.Text =
-            "●  Invalid User ID."
+            "●  Applying avatar..."
 
         Status.TextColor3 =
-            COLORS.Red
+            COLORS.BlueLight
 
-        return
+        local Success, Message =
+            applyAppearance(UserId)
+
+        Status.Text =
+            "●  " .. Message
+
+        if Success then
+
+            Status.TextColor3 =
+                COLORS.Green
+
+            previewAvatar(UserId)
+
+        else
+
+            Status.TextColor3 =
+                COLORS.Red
+
+        end
     end
-
-    Status.Text =
-        "●  Applying avatar..."
-
-    Status.TextColor3 =
-        COLORS.BlueLight
-
-    local Success, Message =
-        applyAppearance(UserId)
-
-    Status.Text =
-        "●  " .. Message
-
-    if Success then
-
-        Status.TextColor3 =
-            COLORS.Green
-
-        previewAvatar(UserId)
-
-    else
-
-        Status.TextColor3 =
-            COLORS.Red
-
-    end
-end)
+)
 
 --========================================================--
 -- DRAGGING
@@ -1203,53 +1431,62 @@ local DragStart
 
 local StartPosition
 
-Header.InputBegan:Connect(function(InputObject)
+Header.InputBegan:Connect(
+    function(InputObject)
 
-    if InputObject.UserInputType ==
-        Enum.UserInputType.MouseButton1 then
+        if InputObject.UserInputType ==
+            Enum.UserInputType.MouseButton1 then
 
-        Dragging =
-            true
+            Dragging =
+                true
 
-        DragStart =
-            InputObject.Position
+            DragStart =
+                InputObject.Position
 
-        StartPosition =
-            Main.Position
+            StartPosition =
+                Main.Position
 
+        end
     end
-end)
+)
 
-UserInputService.InputEnded:Connect(function(InputObject)
+UserInputService.InputEnded:Connect(
+    function(InputObject)
 
-    if InputObject.UserInputType ==
-        Enum.UserInputType.MouseButton1 then
+        if InputObject.UserInputType ==
+            Enum.UserInputType.MouseButton1 then
 
-        Dragging =
-            false
+            Dragging =
+                false
 
+        end
     end
-end)
+)
 
-UserInputService.InputChanged:Connect(function(InputObject)
+UserInputService.InputChanged:Connect(
+    function(InputObject)
 
-    if Dragging
-        and InputObject.UserInputType ==
-        Enum.UserInputType.MouseMovement then
+        if Dragging
+            and InputObject.UserInputType ==
+            Enum.UserInputType.MouseMovement then
 
-        local Delta =
-            InputObject.Position -
-            DragStart
+            local Delta =
+                InputObject.Position -
+                DragStart
 
-        Main.Position =
-            UDim2.new(
-                StartPosition.X.Scale,
-                StartPosition.X.Offset + Delta.X,
-                StartPosition.Y.Scale,
-                StartPosition.Y.Offset + Delta.Y
-            )
+            Main.Position =
+                UDim2.new(
+                    StartPosition.X.Scale,
+                    StartPosition.X.Offset +
+                        Delta.X,
+
+                    StartPosition.Y.Scale,
+                    StartPosition.Y.Offset +
+                        Delta.Y
+                )
+        end
     end
-end)
+)
 
 --========================================================--
 -- OPEN ANIMATION
@@ -1268,8 +1505,27 @@ Tween(
     Main,
     0.4,
     {
-        Size = OriginalSize
+        Size =
+            OriginalSize
     }
 )
 
-print("KAZWARE Avatar Changer v3.0 loaded.")
+--========================================================--
+-- DEVKAZ LOADED
+--========================================================--
+
+print(
+    "=========================================="
+)
+
+print(
+    "       DEVKAZ Avatar Changer v3.0"
+)
+
+print(
+    "          NEON BLUE EDITION"
+)
+
+print(
+    "=========================================="
+)
