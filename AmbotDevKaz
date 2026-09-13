@@ -73,7 +73,7 @@ local Colors = {
 --==================================================
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "KazwarePlayerLock"
+ScreenGui.Name = "DevKazPlayerLock"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.DisplayOrder = 999
@@ -170,7 +170,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, -90, 0, 30)
 Title.Position = UDim2.fromOffset(17, 8)
 Title.BackgroundTransparency = 1
-Title.Text = "KAZWARE"
+Title.Text = "DevKaz"
 Title.TextColor3 = Colors.Text
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 21
@@ -422,7 +422,7 @@ MakeSection("SYSTEM", 282)
 
 local RemoveButton = MakeButton(
     "RemoveKazware",
-    "✕  REMOVE KAZWARE",
+    "✕  REMOVE DevKaz",
     15,
     307,
     280,
@@ -1166,7 +1166,7 @@ local function RemoveKazware()
     end
 
     print("================================")
-    print("KAZWARE REMOVED")
+    print("DevKaz REMOVED")
     print("All connections disconnected.")
     print("Player Lock disabled.")
     print("FOV removed.")
@@ -1190,10 +1190,10 @@ Track(
 UpdateStatus()
 
 print("================================")
-print("KAZWARE PLAYER LOCK LOADED")
+print("DevKaz PLAYER LOCK LOADED")
 print("NEON BLUE EDITION")
 print("Right Click = Player Lock")
 print("Top Bar = Drag")
 print("Minus = Minimize")
-print("REMOVE KAZWARE = Full Shutdown")
+print("REMOVE DevKaz = Full Shutdown")
 print("================================")
