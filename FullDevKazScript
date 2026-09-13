@@ -1,8 +1,9 @@
-
---// KAZWARE v3.0
---// Neon Blue Custom GUI
---// No Rayfield
---// Roblox Studio / your own game
+--==================================================
+-- DEVKAZ v3.0
+-- Neon Blue Custom GUI
+-- No Rayfield
+-- Roblox Studio / your own game
+--==================================================
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -35,6 +36,7 @@ local COLORS = {
 
 local noclip = false
 local minimized = false
+local guiAnimations = true
 
 --==================================================
 -- HELPERS
@@ -48,6 +50,7 @@ local function Create(className, properties, parent)
     end
 
     object.Parent = parent
+
     return object
 end
 
@@ -66,13 +69,28 @@ local function Stroke(parent, color, thickness, transparency)
 end
 
 local function Tween(object, time, properties)
+
+    if not guiAnimations then
+
+        for property, value in pairs(properties) do
+            object[property] = value
+        end
+
+        return
+    end
+
     local tween = TweenService:Create(
         object,
-        TweenInfo.new(time, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+        TweenInfo.new(
+            time,
+            Enum.EasingStyle.Quint,
+            Enum.EasingDirection.Out
+        ),
         properties
     )
 
     tween:Play()
+
     return tween
 end
 
@@ -81,7 +99,7 @@ end
 --==================================================
 
 local ScreenGui = Create("ScreenGui", {
-    Name = "KAZWARE",
+    Name = "DEVKAZ",
     ResetOnSpawn = false,
     ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 }, PlayerGui)
@@ -110,10 +128,11 @@ local TopBar = Create("Frame", {
     Name = "TopBar",
     Size = UDim2.new(1, 0, 0, 60),
     BackgroundColor3 = COLORS.Main,
-    BorderSizePixel = 0
+    BorderSizePixel = 0,
+    Active = true
 }, MainFrame)
 
-local TopCorner = Corner(TopBar, 12)
+Corner(TopBar, 12)
 
 Create("Frame", {
     Size = UDim2.new(1, 0, 0, 15),
@@ -126,7 +145,7 @@ local Logo = Create("TextLabel", {
     Size = UDim2.new(0, 180, 0, 28),
     Position = UDim2.new(0, 20, 0, 7),
     BackgroundTransparency = 1,
-    Text = "KAZWARE",
+    Text = "DEVKAZ",
     TextColor3 = COLORS.Text,
     Font = Enum.Font.GothamBlack,
     TextSize = 22,
@@ -163,17 +182,23 @@ local Minimize = Create("TextButton", {
 Corner(Minimize, 8)
 
 Minimize.MouseEnter:Connect(function()
+
     Tween(Minimize, 0.15, {
         BackgroundColor3 = COLORS.BlueDark
     })
+
 end)
 
 Minimize.MouseLeave:Connect(function()
+
     if not minimized then
+
         Tween(Minimize, 0.15, {
             BackgroundColor3 = COLORS.Panel2
         })
+
     end
+
 end)
 
 --==================================================
@@ -185,21 +210,32 @@ local dragStart
 local startPosition
 
 TopBar.InputBegan:Connect(function(input)
+
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
         dragging = true
         dragStart = input.Position
         startPosition = MainFrame.Position
+
     end
+
 end)
 
-TopBar.InputEnded:Connect(function(input)
+UserInputService.InputEnded:Connect(function(input)
+
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
         dragging = false
+
     end
+
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+
+    if dragging
+        and input.UserInputType == Enum.UserInputType.MouseMovement then
+
         local delta = input.Position - dragStart
 
         MainFrame.Position = UDim2.new(
@@ -208,7 +244,9 @@ UserInputService.InputChanged:Connect(function(input)
             startPosition.Y.Scale,
             startPosition.Y.Offset + delta.Y
         )
+
     end
+
 end)
 
 --==================================================
@@ -256,6 +294,7 @@ local Content = Create("Frame", {
 local Pages = {}
 
 local function CreatePage(name)
+
     local Page = Create("ScrollingFrame", {
         Name = name,
         Size = UDim2.new(1, -30, 1, -30),
@@ -282,6 +321,7 @@ local function CreatePage(name)
     }, Page)
 
     Pages[name] = Page
+
     return Page
 end
 
@@ -292,6 +332,7 @@ end
 local CurrentPage
 
 local function CreateTab(name, icon)
+
     local Button = Create("TextButton", {
         Size = UDim2.new(1, 0, 0, 45),
         BackgroundColor3 = COLORS.Panel,
@@ -325,7 +366,9 @@ local function CreateTab(name, icon)
     }, Button)
 
     Button.MouseEnter:Connect(function()
+
         if CurrentPage ~= name then
+
             Tween(Button, 0.15, {
                 BackgroundTransparency = 0.5
             })
@@ -337,11 +380,15 @@ local function CreateTab(name, icon)
             Tween(Text, 0.15, {
                 TextColor3 = COLORS.Text
             })
+
         end
+
     end)
 
     Button.MouseLeave:Connect(function()
+
         if CurrentPage ~= name then
+
             Tween(Button, 0.15, {
                 BackgroundTransparency = 1
             })
@@ -353,10 +400,13 @@ local function CreateTab(name, icon)
             Tween(Text, 0.15, {
                 TextColor3 = COLORS.SubText
             })
+
         end
+
     end)
 
     Button.MouseButton1Click:Connect(function()
+
         for _, page in pairs(Pages) do
             page.Visible = false
         end
@@ -365,20 +415,40 @@ local function CreateTab(name, icon)
         CurrentPage = name
 
         for _, child in ipairs(TabContainer:GetChildren()) do
+
             if child:IsA("TextButton") then
+
                 if child == Button then
+
                     Tween(child, 0.15, {
                         BackgroundColor3 = COLORS.Blue,
                         BackgroundTransparency = 0
                     })
+
+                    local childIcon =
+                        child:FindFirstChildOfClass("TextLabel")
+
+                    if childIcon then
+
+                        Tween(childIcon, 0.15, {
+                            TextColor3 = COLORS.Text
+                        })
+
+                    end
+
                 else
+
                     Tween(child, 0.15, {
                         BackgroundColor3 = COLORS.Panel,
                         BackgroundTransparency = 1
                     })
+
                 end
+
             end
+
         end
+
     end)
 
     return Button
@@ -389,6 +459,7 @@ end
 --==================================================
 
 local function Section(Page, text)
+
     return Create("TextLabel", {
         Size = UDim2.new(1, 0, 0, 30),
         BackgroundTransparency = 1,
@@ -398,9 +469,11 @@ local function Section(Page, text)
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left
     }, Page)
+
 end
 
 local function Label(Page, text)
+
     local Frame = Create("Frame", {
         Size = UDim2.new(1, 0, 0, 38),
         BackgroundColor3 = COLORS.Panel,
@@ -424,6 +497,7 @@ local function Label(Page, text)
 end
 
 local function Button(Page, text, callback)
+
     local ButtonObject = Create("TextButton", {
         Size = UDim2.new(1, 0, 0, 42),
         BackgroundColor3 = COLORS.Panel,
@@ -436,30 +510,43 @@ local function Button(Page, text, callback)
     }, Page)
 
     Corner(ButtonObject, 8)
-    Stroke(ButtonObject, COLORS.Blue, 1, 0.7)
+
+    Stroke(
+        ButtonObject,
+        COLORS.Blue,
+        1,
+        0.7
+    )
 
     ButtonObject.MouseEnter:Connect(function()
+
         Tween(ButtonObject, 0.15, {
             BackgroundColor3 = COLORS.BlueDark
         })
+
     end)
 
     ButtonObject.MouseLeave:Connect(function()
+
         Tween(ButtonObject, 0.15, {
             BackgroundColor3 = COLORS.Panel
         })
+
     end)
 
     ButtonObject.MouseButton1Click:Connect(function()
+
         if callback then
             callback()
         end
+
     end)
 
     return ButtonObject
 end
 
 local function Toggle(Page, text, default, callback)
+
     local State = default or false
 
     local Holder = Create("Frame", {
@@ -502,7 +589,9 @@ local function Toggle(Page, text, default, callback)
     Corner(Circle, 20)
 
     local function Update()
+
         if State then
+
             Tween(Switch, 0.2, {
                 BackgroundColor3 = COLORS.Blue
             })
@@ -511,7 +600,9 @@ local function Toggle(Page, text, default, callback)
                 Position = UDim2.new(1, -20, 0.5, -8),
                 BackgroundColor3 = COLORS.Text
             })
+
         else
+
             Tween(Switch, 0.2, {
                 BackgroundColor3 = COLORS.Panel2
             })
@@ -520,19 +611,25 @@ local function Toggle(Page, text, default, callback)
                 Position = UDim2.new(0, 3, 0.5, -8),
                 BackgroundColor3 = COLORS.SubText
             })
+
         end
+
     end
 
     Switch.MouseButton1Click:Connect(function()
+
         State = not State
+
         Update()
 
         if callback then
             callback(State)
         end
+
     end)
 
     Update()
+
     return Holder
 end
 
@@ -546,7 +643,7 @@ local ScriptsPage = CreatePage("Scripts")
 local SettingsPage = CreatePage("Settings")
 
 --==================================================
--- PROFILE CARD
+-- PROFILE
 --==================================================
 
 Section(MainPage, "PROFILE")
@@ -558,7 +655,13 @@ local ProfileCard = Create("Frame", {
 }, MainPage)
 
 Corner(ProfileCard, 10)
-Stroke(ProfileCard, COLORS.Blue, 1, 0.75)
+
+Stroke(
+    ProfileCard,
+    COLORS.Blue,
+    1,
+    0.75
+)
 
 local ProfileImage = Create("ImageLabel", {
     Size = UDim2.new(0, 75, 0, 75),
@@ -596,54 +699,98 @@ local ProfileStatus = Create("TextLabel", {
     Size = UDim2.new(1, -110, 0, 20),
     Position = UDim2.new(0, 105, 0, 70),
     BackgroundTransparency = 1,
-    Text = "● KAZWARE User",
+    Text = "● DEVKAZ User",
     TextColor3 = COLORS.Green,
     Font = Enum.Font.GothamMedium,
     TextSize = 11,
     TextXAlignment = Enum.TextXAlignment.Left
 }, ProfileCard)
 
--- Automatic Roblox avatar thumbnail
 task.spawn(function()
+
     local success, image = pcall(function()
+
         return Players:GetUserThumbnailAsync(
             Player.UserId,
             Enum.ThumbnailType.HeadShot,
             Enum.ThumbnailSize.Size150x150
         )
+
     end)
 
     if success and image then
         ProfileImage.Image = image
     end
+
 end)
 
 --==================================================
 -- ACCOUNT INFORMATION
 --==================================================
 
-Section(MainPage, "ACCOUNT INFORMATION")
+Section(
+    MainPage,
+    "ACCOUNT INFORMATION"
+)
 
-Label(MainPage, "Username: @" .. Player.Name)
-Label(MainPage, "Display Name: " .. Player.DisplayName)
-Label(MainPage, "User ID: " .. tostring(Player.UserId))
+Label(
+    MainPage,
+    "Username: @" .. Player.Name
+)
 
-Section(MainPage, "ABOUT KAZWARE")
+Label(
+    MainPage,
+    "Display Name: " .. Player.DisplayName
+)
 
-Label(MainPage, "Made by: KAZWARE")
-Label(MainPage, "Developer: Kaz")
-Label(MainPage, "Version: v3.0.0")
-Label(MainPage, "Theme: Neon Blue")
+Label(
+    MainPage,
+    "User ID: " .. tostring(Player.UserId)
+)
 
-Section(MainPage, "STATUS")
+Section(
+    MainPage,
+    "ABOUT DEVKAZ"
+)
 
-Label(MainPage, "KAZWARE is ready.")
+Label(
+    MainPage,
+    "Made by: DEVKAZ"
+)
+
+Label(
+    MainPage,
+    "Developer: DevKaz"
+)
+
+Label(
+    MainPage,
+    "Version: v3.0.0"
+)
+
+Label(
+    MainPage,
+    "Theme: Neon Blue"
+)
+
+Section(
+    MainPage,
+    "STATUS"
+)
+
+Label(
+    MainPage,
+    "DEVKAZ is ready."
+)
 
 --==================================================
 -- PLAYER PAGE
 --==================================================
 
-Section(PlayerPage, "PLAYER SETTINGS")
+Section(
+    PlayerPage,
+    "PLAYER SETTINGS"
+)
 
 --==================================================
 -- WALK SPEED
@@ -708,6 +855,7 @@ local speed = 16
 local speedDragging = false
 
 local function UpdateSpeedSlider(mouseX)
+
     local absolute = SpeedBar.AbsolutePosition
     local size = SpeedBar.AbsoluteSize
 
@@ -717,22 +865,35 @@ local function UpdateSpeedSlider(mouseX)
         1
     )
 
-    speed = math.floor(16 + ((100 - 16) * percent))
+    speed = math.floor(
+        16 + ((100 - 16) * percent)
+    )
 
     SpeedValue.Text = tostring(speed)
-    SpeedFill.Size = UDim2.new(percent, 0, 1, 0)
+
+    SpeedFill.Size =
+        UDim2.new(percent, 0, 1, 0)
 
     local Character = Player.Character
-    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+    local Humanoid =
+        Character and
+        Character:FindFirstChildOfClass("Humanoid")
 
     if Humanoid then
         Humanoid.WalkSpeed = speed
     end
+
 end
 
 SpeedButton.MouseButton1Down:Connect(function()
+
     speedDragging = true
-    UpdateSpeedSlider(UserInputService:GetMouseLocation().X)
+
+    UpdateSpeedSlider(
+        UserInputService:GetMouseLocation().X
+    )
+
 end)
 
 --==================================================
@@ -797,6 +958,7 @@ local JumpButton = Create("TextButton", {
 local jumpDragging = false
 
 local function UpdateJumpSlider(mouseX)
+
     local absolute = JumpBar.AbsolutePosition
     local size = JumpBar.AbsoluteSize
 
@@ -806,136 +968,547 @@ local function UpdateJumpSlider(mouseX)
         1
     )
 
-    local jump = math.floor(7 + ((100 - 7) * percent))
+    local jump = math.floor(
+        7 + ((100 - 7) * percent)
+    )
 
     JumpValue.Text = tostring(jump)
-    JumpFill.Size = UDim2.new(percent, 0, 1, 0)
+
+    JumpFill.Size =
+        UDim2.new(percent, 0, 1, 0)
 
     local Character = Player.Character
-    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+    local Humanoid =
+        Character and
+        Character:FindFirstChildOfClass("Humanoid")
 
     if Humanoid then
+
         Humanoid.UseJumpPower = false
         Humanoid.JumpHeight = jump
+
     end
+
 end
 
 JumpButton.MouseButton1Down:Connect(function()
+
     jumpDragging = true
-    UpdateJumpSlider(UserInputService:GetMouseLocation().X)
+
+    UpdateJumpSlider(
+        UserInputService:GetMouseLocation().X
+    )
+
 end)
 
+--==================================================
+-- SLIDER INPUT
+--==================================================
+
 UserInputService.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
+
+    if input.UserInputType ==
+        Enum.UserInputType.MouseMovement then
+
         local mouseX = input.Position.X
 
         if speedDragging then
+
             UpdateSpeedSlider(mouseX)
+
         elseif jumpDragging then
+
             UpdateJumpSlider(mouseX)
+
         end
+
     end
+
 end)
 
 UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+    if input.UserInputType ==
+        Enum.UserInputType.MouseButton1 then
+
         speedDragging = false
         jumpDragging = false
+
     end
+
 end)
 
 --==================================================
 -- NOCLIP
 --==================================================
 
-Toggle(PlayerPage, "Noclip", false, function(value)
-    noclip = value
+Toggle(
+    PlayerPage,
+    "Noclip",
+    false,
+    function(value)
 
-    if not noclip then
-        local Character = Player.Character
+        noclip = value
 
-        if Character then
-            for _, part in ipairs(Character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = true
+        if not noclip then
+
+            local Character =
+                Player.Character
+
+            if Character then
+
+                for _, part in
+                    ipairs(
+                        Character:GetDescendants()
+                    ) do
+
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+
                 end
+
             end
+
         end
+
     end
-end)
+)
 
 RunService.Stepped:Connect(function()
-    if noclip then
-        local Character = Player.Character
 
-        if Character then
-            for _, part in ipairs(Character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-        end
+    if not noclip then
+        return
     end
+
+    local Character =
+        Player.Character
+
+    if not Character then
+        return
+    end
+
+    for _, part in
+        ipairs(
+            Character:GetDescendants()
+        ) do
+
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+
+    end
+
 end)
 
 --==================================================
 -- SCRIPTS PAGE
 --==================================================
 
-Section(ScriptsPage, "KAZWARE SCRIPTS")
+Section(
+    ScriptsPage,
+    "DEVKAZ PROJECTS"
+)
 
-Button(ScriptsPage, "Infinite Yield", function()
-    loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"
-    ))()
-end)
+Label(
+    ScriptsPage,
+    "Launch your DEVKAZ projects and tools."
+)
 
-Button(ScriptsPage, "Animation Hub", function()
-    loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/midnightkaz777-sketch/Kazwarezxhcjehsd/refs/heads/main/annim"
-    ))()
-end)
+--==================================================
+-- SCRIPT CARD
+--==================================================
 
-Button(ScriptsPage, "Avatar Changer", function()
-    loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/midnightkaz777-sketch/Kazwarezxhcjehsd/refs/heads/main/avatar"
-    ))()
-end)
+local function ScriptCard(
+    Page,
+    title,
+    description,
+    buttonText,
+    callback
+)
 
-Button(ScriptsPage, "Aimbot", function()
-    loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/midnightkaz777-sketch/Kazwarezxhcjehsd/refs/heads/main/ambot"
-    ))()
-end)
+    local Card = Create("Frame", {
+        Size = UDim2.new(1, 0, 0, 90),
+        BackgroundColor3 = COLORS.Panel,
+        BorderSizePixel = 0
+    }, Page)
 
-Button(ScriptsPage, "Trigger Bot", function()
-    loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/midnightkaz777-sketch/Kazwarezxhcjehsd/refs/heads/main/rayfeild"
-    ))()
-end)
+    Corner(Card, 10)
 
-Button(ScriptsPage, "Bedwars", function()
-    loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/themagicpiston/pistonware/refs/heads/main/reinstall.lua",
-        true
-    ))()
-end)
+    Stroke(
+        Card,
+        COLORS.Blue,
+        1,
+        0.75
+    )
+
+    -- Accent
+    local Accent = Create("Frame", {
+        Size = UDim2.new(0, 4, 1, -20),
+        Position = UDim2.new(0, 8, 0, 10),
+        BackgroundColor3 = COLORS.Blue,
+        BorderSizePixel = 0
+    }, Card)
+
+    Corner(Accent, 4)
+
+    -- Title
+    Create("TextLabel", {
+        Size = UDim2.new(1, -190, 0, 25),
+        Position = UDim2.new(0, 25, 0, 12),
+        BackgroundTransparency = 1,
+        Text = title,
+        TextColor3 = COLORS.Text,
+        Font = Enum.Font.GothamBold,
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left
+    }, Card)
+
+    -- Description
+    Create("TextLabel", {
+        Size = UDim2.new(1, -190, 0, 35),
+        Position = UDim2.new(0, 25, 0, 38),
+        BackgroundTransparency = 1,
+        Text = description,
+        TextColor3 = COLORS.SubText,
+        Font = Enum.Font.GothamMedium,
+        TextSize = 10,
+        TextWrapped = true,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top
+    }, Card)
+
+    -- Execute button
+    local ExecuteButton = Create("TextButton", {
+        Size = UDim2.new(0, 145, 0, 38),
+        Position = UDim2.new(1, -160, 0.5, -19),
+        BackgroundColor3 = COLORS.Panel2,
+        Text = buttonText,
+        TextColor3 = COLORS.Text,
+        Font = Enum.Font.GothamBold,
+        TextSize = 11,
+        AutoButtonColor = false,
+        BorderSizePixel = 0
+    }, Card)
+
+    Corner(ExecuteButton, 8)
+
+    Stroke(
+        ExecuteButton,
+        COLORS.Blue,
+        1,
+        0.45
+    )
+
+    ExecuteButton.MouseEnter:Connect(function()
+
+        Tween(
+            ExecuteButton,
+            0.15,
+            {
+                BackgroundColor3 =
+                    COLORS.BlueDark
+            }
+        )
+
+    end)
+
+    ExecuteButton.MouseLeave:Connect(function()
+
+        Tween(
+            ExecuteButton,
+            0.15,
+            {
+                BackgroundColor3 =
+                    COLORS.Panel2
+            }
+        )
+
+    end)
+
+    ExecuteButton.MouseButton1Click:Connect(function()
+
+        if callback then
+            callback()
+        end
+
+    end)
+
+    return Card
+end
+
+--==================================================
+-- AVATAR CHANGER
+--==================================================
+
+ScriptCard(
+    ScriptsPage,
+
+    "Avatar Changer",
+
+    "Change your character appearance using the DEVKAZ Avatar Changer.",
+
+    "Execute",
+
+    function()
+
+        local success, errorMessage =
+            pcall(function()
+
+                loadstring(game:HttpGet(
+                    "https://raw.githubusercontent.com/midnightkaz777-sketch/KazWareFull/refs/heads/main/AvatarDevKaz"
+                ))()
+
+            end)
+
+        if success then
+
+            print(
+                "DEVKAZ Avatar Changer executed successfully."
+            )
+
+        else
+
+            warn(
+                "DEVKAZ Avatar Changer failed:",
+                errorMessage
+            )
+
+        end
+
+    end
+)
+
+--==================================================
+-- INFINITE YIELD
+--==================================================
+
+ScriptCard(
+    ScriptsPage,
+
+    "Infinite Yield",
+
+    "A utility command interface with a large collection of admin-style commands.",
+
+    "Execute",
+
+    function()
+
+        local success, errorMessage =
+            pcall(function()
+
+                loadstring(game:HttpGet(
+                    "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"
+                ))()
+
+            end)
+
+        if success then
+
+            print(
+                "DEVKAZ Infinite Yield executed successfully."
+            )
+
+        else
+
+            warn(
+                "DEVKAZ Infinite Yield failed:",
+                errorMessage
+            )
+
+        end
+
+    end
+)
+
+--==================================================
+-- AMBOT
+--==================================================
+
+ScriptCard(
+    ScriptsPage,
+
+    "Aimbot",
+
+    "A utility Aiming interface",
+
+    "Execute",
+
+    function()
+
+        local success, errorMessage =
+            pcall(function()
+
+                loadstring(game:HttpGet(
+                    "https://raw.githubusercontent.com/midnightkaz777-sketch/KazWareFull/refs/heads/main/AmbotDevKaz"
+                ))()
+
+            end)
+
+        if success then
+
+            print(
+                "DEVKAZ Aimbot executed successfully."
+            )
+
+        else
+
+            warn(
+                "DEVKAZ Aimbot failed:",
+                errorMessage
+            )
+
+        end
+
+    end
+)
+
+--==================================================
+-- MORE PROJECTS
+--==================================================
+
+Label(
+    ScriptsPage,
+    "More DEVKAZ projects coming soon."
+)
 
 --==================================================
 -- SETTINGS
 --==================================================
 
-Section(SettingsPage, "GUI SETTINGS")
+Section(
+    SettingsPage,
+    "GUI SETTINGS"
+)
 
-Toggle(SettingsPage, "GUI Animations", true, function(value)
-    print("Animations:", value)
-end)
+Toggle(
+    SettingsPage,
+    "GUI Animations",
+    true,
+    function(value)
 
-Button(SettingsPage, "Reset GUI Position", function()
-    Tween(MainFrame, 0.35, {
-        Position = UDim2.new(0.5, -350, 0.5, -225)
-    })
-end)
+        guiAnimations = value
+
+        print(
+            "DEVKAZ Animations:",
+            value
+        )
+
+    end
+)
+
+Button(
+    SettingsPage,
+    "Reset GUI Position",
+    function()
+
+        Tween(
+            MainFrame,
+            0.35,
+            {
+                Position =
+                    UDim2.new(
+                        0.5,
+                        -350,
+                        0.5,
+                        -225
+                    )
+            }
+        )
+
+    end
+)
+
+Button(
+    SettingsPage,
+    "Reset Player Settings",
+    function()
+
+        speed = 16
+
+        SpeedValue.Text = "16"
+
+        SpeedFill.Size =
+            UDim2.new(
+                0,
+                0,
+                1,
+                0
+            )
+
+        local Character =
+            Player.Character
+
+        local Humanoid =
+            Character and
+            Character:FindFirstChildOfClass(
+                "Humanoid"
+            )
+
+        if Humanoid then
+
+            Humanoid.WalkSpeed = 16
+            Humanoid.UseJumpPower = false
+            Humanoid.JumpHeight = 7
+
+        end
+
+        JumpValue.Text = "7"
+
+        JumpFill.Size =
+            UDim2.new(
+                0,
+                0,
+                1,
+                0
+            )
+
+    end
+)
+
+Button(
+    SettingsPage,
+    "Remove DEVKAZ",
+    function()
+
+        noclip = false
+
+        local Character =
+            Player.Character
+
+        if Character then
+
+            for _, part in
+                ipairs(
+                    Character:GetDescendants()
+                ) do
+
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+
+            end
+
+            local Humanoid =
+                Character:FindFirstChildOfClass(
+                    "Humanoid"
+                )
+
+            if Humanoid then
+
+                Humanoid.WalkSpeed = 16
+                Humanoid.UseJumpPower = false
+                Humanoid.JumpHeight = 7
+
+            end
+
+        end
+
+        ScreenGui:Destroy()
+
+    end
+)
 
 --==================================================
 -- TABS
@@ -953,45 +1526,102 @@ CreateTab("Settings", "⚙")
 CurrentPage = "Main"
 MainPage.Visible = true
 
-local firstTab = TabContainer:FindFirstChildOfClass("TextButton")
+local firstTab =
+    TabContainer:FindFirstChildOfClass(
+        "TextButton"
+    )
 
 if firstTab then
-    firstTab.BackgroundColor3 = COLORS.Blue
+
+    firstTab.BackgroundColor3 =
+        COLORS.Blue
+
     firstTab.BackgroundTransparency = 0
+
+    local firstIcon =
+        firstTab:FindFirstChildOfClass(
+            "TextLabel"
+        )
+
+    if firstIcon then
+
+        firstIcon.TextColor3 =
+            COLORS.Text
+
+    end
+
 end
 
 --==================================================
 -- MINIMIZE
 --==================================================
 
-local OriginalSize = MainFrame.Size
+local OriginalSize =
+    MainFrame.Size
 
 Minimize.MouseButton1Click:Connect(function()
+
     minimized = not minimized
 
     if minimized then
-        Tween(MainFrame, 0.3, {
-            Size = UDim2.new(0, 700, 0, 60)
-        })
+
+        Tween(
+            MainFrame,
+            0.3,
+            {
+                Size =
+                    UDim2.new(
+                        0,
+                        700,
+                        0,
+                        60
+                    )
+            }
+        )
 
         Minimize.Text = "+"
+
     else
-        Tween(MainFrame, 0.3, {
-            Size = OriginalSize
-        })
+
+        Tween(
+            MainFrame,
+            0.3,
+            {
+                Size = OriginalSize
+            }
+        )
 
         Minimize.Text = "—"
+
     end
+
 end)
 
 --==================================================
 -- OPEN ANIMATION
 --==================================================
 
-MainFrame.Size = UDim2.new(0, 0, 0, 0)
+MainFrame.Size =
+    UDim2.new(
+        0,
+        0,
+        0,
+        0
+    )
 
-Tween(MainFrame, 0.45, {
-    Size = OriginalSize
-})
+Tween(
+    MainFrame,
+    0.45,
+    {
+        Size = OriginalSize
+    }
+)
 
-print("KAZWARE loaded successfully.")
+--==================================================
+-- DEVKAZ LOADED
+--==================================================
+
+print("======================================")
+print("        DEVKAZ v3.0 LOADED")
+print("           NEON BLUE EDITION")
+print("======================================")
